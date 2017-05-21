@@ -1,0 +1,6 @@
+{%- from 'telegraf/settings.sls' import telegraf with context -%}
+# Managed by Salt
+
+[[inputs.docker]]
+  endpoint = "unix:///var/run/docker.sock"
+  container_names = []

@@ -1,0 +1,3 @@
+telegraf:
+  statsd_enabled: true
+  insecure_skip_verify: true

@@ -1,0 +1,54 @@
+{%- from 'telegraf/settings.sls' import telegraf with context -%}
+# Managed by Salt
+
+[global_tags]
+  env = "{{ env }}"
+  region = "{{ region }}"
+  service = "{{ service }}"
+
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_buffer_limit = 10000
+  flush_buffer_when_full = true
+  collection_jitter = "8s"
+  flush_interval = "10s"
+  flush_jitter = "0s"
+
+  ## Run telegraf in debug mode
+  debug = false
+  ## Run telegraf in quiet mode
+  quiet = false
+  ## Override default hostname, if empty use os.Hostname()
+  hostname = "{{ id }}"
+
+# OUTPUTS
+# telegraf output
+[[outputs.influxdb]]
+  urls = ["https://{{ influxdb_host }}:{{ influxdb_port }}"]
+  database = "{{ database }}" # required
+  precision = "s"
+  username = "{{ username }}"
+  password = "{{ password }}"
+  user_agent = "{{ user_agent }}"
+{% if telegraf.statsd_enabled %}
+  namedrop = ["stats*"]
+{% if telegraf.insecure_skip_verify %}
+  insecure_skip_verify = true
+{% endif %}
+{% endif %}
+
+{% if telegraf.statsd_enabled -%}
+# statsd output
+[[outputs.influxdb]]
+  urls = ["https://{{ influxdb_host }}:{{ influxdb_port }}"]
+  database = "{{ statsd_database }}" # required
+  precision = "s"
+  username = "{{ username }}"
+  password = "{{ password }}"
+  user_agent = "{{ user_agent }}"
+  namepass = ["stats*"]
+{% if telegraf.insecure_skip_verify %}
+  insecure_skip_verify = true
+{% endif %}
+{% endif %}
